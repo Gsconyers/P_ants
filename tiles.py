@@ -1,3 +1,4 @@
+import random
 class Tile:
     def __init__(self,assigned_name):
         self.name = assigned_name
@@ -184,8 +185,17 @@ class Ant:
 
         return adjacent_pheromone
 
-    def go_somewhere(self):
-        return None
+    def move_decide(self):
+        adjacent_pheromone = self.sniff()
+        lotto_bag = []
+        for direction in adjacent_pheromone:
+            while adjacent_pheromone[direction] >=1:
+                lotto_bag.append("{direction}".format(direction = direction))
+                adjacent_pheromone[direction] -= 1
+        decision = random.choice(lotto_bag)
+        print(decision)
+
+
 
 def debug():
     grid = Grid(3)
@@ -195,9 +205,11 @@ def debug():
             for value in grid.grid[x][y].neighbors:
                 print(grid.grid[x][y].neighbors[value])
     debug_ant = Ant(grid.nest_x,grid.nest_y,grid)
-    adjacent_pheromones = debug_ant.sniff()
-    for key in adjacent_pheromones:
-        print("{key},{value}".format(key = key, value = adjacent_pheromones[key]))
+    debug_ant.move_decide()
+    debug_ant.move_decide()
+    debug_ant.move_decide()
+    debug_ant.move_decide()
+    debug_ant.move_decide()
 
 debug()
 
