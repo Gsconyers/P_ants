@@ -193,7 +193,7 @@ class Ant:
                 lotto_bag.append("{direction}".format(direction = direction))
                 adjacent_pheromone[direction] -= 1
         decision = random.choice(lotto_bag)
-        print(decision)
+        return decision
 
 
 
@@ -205,11 +205,8 @@ def debug():
             for value in grid.grid[x][y].neighbors:
                 print(grid.grid[x][y].neighbors[value])
     debug_ant = Ant(grid.nest_x,grid.nest_y,grid)
-    debug_ant.move_decide()
-    debug_ant.move_decide()
-    debug_ant.move_decide()
-    debug_ant.move_decide()
-    debug_ant.move_decide()
+    for x in range(0,10):
+        print(debug_ant.move_decide())
 
 debug()
 
