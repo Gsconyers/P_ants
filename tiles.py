@@ -1,4 +1,7 @@
 import random
+import time
+import multiprocessing
+
 class Tile:
     def __init__(self,assigned_name):
         self.name = assigned_name
@@ -195,7 +198,16 @@ class Ant:
         decision = random.choice(lotto_bag)
         return decision
 
-
+    def move(self):
+        direction = self.move_decide()
+        if direction == "North":
+            self.x_pos -= 1
+        elif direction == "South":
+            self.x_pos += 1
+        elif direction == "East":
+            self.y_pos += 1
+        elif direction == "West":
+            self.y_pos -= 1
 
 def debug():
     grid = Grid(3)
@@ -207,6 +219,58 @@ def debug():
     debug_ant = Ant(grid.nest_x,grid.nest_y,grid)
     for x in range(0,10):
         print(debug_ant.move_decide())
+# controls ant numbers:
+upper_bound = 10**6
 
-debug()
+def single_thread_test():
+    grid_size = 8
+    single_grid = Grid(grid_size)
+    single_grid.gen_links()
+    ants = []
+    for x in range(0,upper_bound):
+        x_pos = random.randint(0,grid_size-1)
+        y_pos = random.randint(0,grid_size-1)
+        new_ant = Ant(x_pos,y_pos,single_grid)
+        ants.append(new_ant)
+    t0 = time.time()
+    for ant in ants:
+        ant.move()
+    t1 = time.time()
+    total = t1-t0
+    print("Single thread test = {total} seconds".format(total=total))
 
+def thread_main(ant_array):
+    for item in ant_array:
+        item.move()
+
+grid_size = 8
+multi_grid = Grid(grid_size)
+multi_grid.gen_links()
+ants = []
+for x in range(0, upper_bound):
+    x_pos = random.randint(0, grid_size - 1)
+    y_pos = random.randint(0, grid_size - 1)
+    new_ant = Ant(x_pos, y_pos, multi_grid)
+    ants.append(new_ant)
+array_first_half = []
+for each in range(0,(len(ants))//2):
+    array_first_half.append(ants[each])
+array_second_half = []
+for each in range((len(ants)//2)+1,len(ants)):
+    array_second_half.append(ants[each])
+
+if __name__ == '__main__':
+    p1 = multiprocessing.Process(target=thread_main, args=(array_first_half,))
+    p2 = multiprocessing.Process(target=thread_main, args=(array_second_half,))
+    t0 = time.time()
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()
+    p1.close()
+    p2.close()
+    t1 = time.time()
+    total = t1-t0
+    print("multi thread = {total} seconds".format(total=total))
+
+single_thread_test()
